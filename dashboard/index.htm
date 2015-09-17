@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<head>
+	<title>Dashbosard</title>
+	<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="css/screen.css" media="screen" />
+</head>
+<body>
+
+<div id="header">
+	<h1><img src="images/logo.png" width="200px" /></h1>
+	<ul>
+		<li><a href="#" ><img src="images/save-50.png" /><span>SAVE</span></a></li>
+		<li><a href="#" id="disableCanvas"><img src="images/remove-50.png" /><span>DEACTIVATE</span></a></li>
+		<li><a href="#"><img src="images/exit-50.png" /><span>LOGOUT</span></a></li>
+	</ul>
+</div>
+<div class="colmask threecol">
+	<div class="colmid">
+		<div class="colleft">
+			<div class="col1" id="container">
+				<!-- Column 1 start -->
+					<canvas id="canvas" width="700" height="500"></canvas>
+					<canvas id="tmp_canvas" width="700" height="500"></canvas>					
+				<!-- Column 1 end -->
+			</div>
+			<div class="col2">
+				<!-- Column 2 start -->
+				<p>Online Members</p>
+					<div id="online-users">
+				      <div> <img src="images/user-50.png" /><br>JOHN DOE</div>
+				      <div> <img src="images/user-50.png" /><br>JOHN DOE</div>
+				      <div> <img src="images/user-50.png" /><br>JOHN DOE</div>
+				      <div> <img src="images/user-50.png" /><br>JOHN DOE</div>
+				      <div> <img src="images/user-50.png" /><br>JOHN DOE</div>
+				      <div> <img src="images/user-50.png" /><br>JOHN DOE</div>
+				      <div> <img src="images/user-50.png" /><br>JOHN DOE</div>
+				      <div> <img src="images/user-50.png" /><br>JOHN DOE</div>
+				    </div>
+				<!-- Column 2 end -->
+			</div>
+			<div class="col3">
+				<!-- Column 3 start -->
+				<p>Dynamic Tools</p>
+				<div id="tools">
+				<div id="clearBtn"> <img src="images/broom-50.png" /><br>Clear Screen</div>
+				<div style="padding:10px"> <input type="range" min="0" max="50" value="5" id="sizeBtn"/><br>Size</div>
+				<div style="padding:10px"> <input type="color" placeholder="#FF0000"  value="#FF0000" id="strokeColorBtn"/><br>Stroke Color</div>
+				<div style="padding:10px"> <input type="color" placeholder="#FFFFFF"  value="#FFFFFF" id="fillColorBtn"/><br>Fill Color</div>
+				<div id="lineBtn"><img src="images/line-50.png" /><br>Line</div>
+				<div id="brushBtn"><img src="images/brush-50.png" /><br>Brush</div>
+				<div id="rectangleBtn"><img src="images/rectangle-50.png" /><br>Rectangle</div>
+				<div id="ellipseBtn"><img src="images/broom-50.png" /><br>Ellipse</div>
+				<div id="circleBtn"><img src="images/new moon-50.png" /><br>Circle</div>
+				<div id="eraseBtn"><img src="images/erase-50.png" /><br>Eraser</div>
+				</div>
+				<!-- Column 3 end -->				
+			</div>
+		</div>
+	</div>
+</div>
+<div id="footer">
+	<p>This section is the footer</p>
+</div>
+
+<script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript" ></script>
+<script type="text/javascript" src="js/script.js"></script>
+
+</body>
+</html>
