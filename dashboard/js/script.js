@@ -14,7 +14,11 @@ var DrawTogether = function(canvas, container){
 	this.rect = false;
 	this.ellipse = false;
 	this.brush = false;
+	this.erase = false;
 	this.circle = false;
+	this.strokeHoler = '#ff0000';
+	this.fillHoler = '#ffffff';
+	this.lineWidthHoler = 5;
 	this.posX = '';
 	this.posY = '';
 	this.startX = 0;
@@ -45,6 +49,7 @@ var DrawTogether = function(canvas, container){
 		this.rect = false;
 		this.ellipse = false;
 		this.brush = false;
+		this.erase = false;
 		this.circle = false;
 	}
 
@@ -54,6 +59,8 @@ var DrawTogether = function(canvas, container){
 		this.line = false;
 		this.rect = true;
 		this.ellipse = false;
+		this.brush = false;
+		this.erase = false;
 		this.circle = false;
 	}
 
@@ -65,6 +72,7 @@ var DrawTogether = function(canvas, container){
 		this.ellipse = true;
 		this.circle = false;
 		this.brush = false;
+		this.erase = false;
 	}
 	
 	this.startCircle = function(x,y){
@@ -74,6 +82,7 @@ var DrawTogether = function(canvas, container){
 		this.rect = false;
 		this.ellipse = false;
 		this.brush = false;
+		this.erase = false;
 		this.circle = true;
 	}
 	
@@ -83,7 +92,19 @@ var DrawTogether = function(canvas, container){
 		this.line = false;
 		this.rect = false;
 		this.ellipse = false;
+		this.erase = false;
 		this.brush = true;
+		this.circle = false;
+	}
+	
+	this.startErase = function(x,y){
+		this.posX = x;
+		this.posY = y;
+		this.line = false;
+		this.rect = false;
+		this.ellipse = false;
+		this.erase = true;
+		this.brush = false;
 		this.circle = false;
 	}
 
@@ -94,6 +115,7 @@ var DrawTogether = function(canvas, container){
 		this.rect = false;
 		this.ellipse = false;
 		this.brush = false;
+		this.erase = false;
 		this.circle = false;
 
 		this.ppts = [];
@@ -118,6 +140,11 @@ var DrawTogether = function(canvas, container){
 	
 	this.drawBrush = function(x,y){
 		var obj = {x:x, y:y, color: {stroke:tmp_ctx.strokeStyle, fill:tmp_ctx.fillStyle, size: tmp_ctx.lineWidth}, type:'brush'};
+		return obj;
+	}
+	
+	this.drawErase = function(x,y){
+		var obj = {x:x, y:y, color: {stroke:'#fff', fill:'#fff', size: tmp_ctx.lineWidth}, type:'erase'};
 		return obj;
 	}
 	
@@ -158,15 +185,6 @@ var DrawTogether = function(canvas, container){
 	}
 
 	this.drawCircleCoors = function(xx,yy, color){
-		/*tmp_ctx.beginPath();
-		var width = Math.abs(x - this.startX);
-		var height = Math.abs(y - this.startY);
-		tmp_ctx.fillStyle = color.fill;
-		tmp_ctx.strokeStyle = color.stroke;
-		tmp_ctx.arc(this.startX, this.startY, 50, width, height);
-		tmp_ctx.fill();
-		tmp_ctx.stroke();
-		tmp_ctx.closePath();*/
 
 		var x = (xx + this.startX) / 2;
 		var y = (yy + this.startY) / 2;
@@ -215,6 +233,11 @@ var DrawTogether = function(canvas, container){
 
 	this.drawBrushCoors = 	function(x, y, color) {
 		if(x!==0&&x!==''&&x!==undefined&&x!==null){
+			tmp_ctx.fillStyle = color.fill;
+			tmp_ctx.strokeStyle = color.stroke;
+			tmp_ctx.lineWidth = color.size;
+
+
 			tmp_ctx.beginPath();
 			tmp_ctx.moveTo(x, y);
 			tmp_ctx.lineTo((this.posX !== '')?this.posX:x, (this.posY !== '')?this.posY:y);
@@ -228,6 +251,28 @@ var DrawTogether = function(canvas, container){
 		return ('Coordinates Brush ' + x + ' - ' + y);
 	}
 
+	this.drawEraseCoors = 	function(x, y, color) {
+		if(x!==0&&x!==''&&x!==undefined&&x!==null){
+			//erase
+			//tmp_ctx.globalCompositeOperation = 'destination-out';
+			tmp_ctx.fillStyle = color.fill;
+			tmp_ctx.strokeStyle = color.stroke;
+			tmp_ctx.lineWidth = color.size;
+
+
+			tmp_ctx.beginPath();
+			tmp_ctx.moveTo(x, y);
+			tmp_ctx.lineTo((this.posX !== '')?this.posX:x, (this.posY !== '')?this.posY:y);
+			tmp_ctx.stroke();
+			tmp_ctx.closePath();
+		}
+
+		this.posX = x;
+		this.posY = y;
+		
+		return ('Coordinates Erase ' + x + ' - ' + y);
+	}
+
 
 	this.drawCoors = function(object, clear){
 		var temp = 'hello world';
@@ -238,7 +283,10 @@ var DrawTogether = function(canvas, container){
 		switch(type){
 			case 'brush':
 				temp = this.drawBrushCoors(x,y,color);
-				break;			
+				break;
+			case 'erase':
+				temp = this.drawEraseCoors(x,y,color);
+				break;						
 			default:
 				break;
 		}
@@ -311,6 +359,18 @@ var DrawTogether = function(canvas, container){
 		return context.lineWidth;
 	}
 
+	this.getCurrentStyle = function(){
+		this.strokeHoler = this.getStrokeColor();
+		this.fillHoler = this.getfillColor();
+		this.lineWidthHoler = this.getStrokeSize();
+	}
+
+	this.setCurrentStyle = function(){
+		this.setStrokeColor(this.strokeHoler);
+		this.setfillColor(this.fillHoler);
+		this.setStrokeSize(this.lineWidthHoler);
+	}
+
 
 
 
@@ -349,27 +409,56 @@ $(document).ready(function(){
 
 
 		$('#lineBtn').click(function(){
+			if(theDraw.isDraw === 'erase'){ theDraw.setCurrentStyle(); }
 			theDraw.isDraw = 'line';
+			//$("div#tools>div").removeClass('acive');
+			$("#tools>div.active").removeClass("active");
+			$(this).addClass('active');
+			$canvas.attr('class', 'draw');
 		});
 
 		$('#rectangleBtn').click(function(){
+			if(theDraw.isDraw === 'erase'){ theDraw.setCurrentStyle(); }
 			theDraw.isDraw = 'rect';
+			$("#tools>div.active").removeClass("active");
+			$(this).addClass('active');
+			$canvas.attr('class', 'draw');
 		});
 
 		$('#ellipseBtn').click(function(){
+			if(theDraw.isDraw === 'erase'){ theDraw.setCurrentStyle(); }
 			theDraw.isDraw = 'ellipse';
+			$("#tools>div.active").removeClass("active");
+			$(this).addClass('active');
+			$canvas.attr('class', 'draw');
 		});
 		
 		$('#brushBtn').click(function(){
+			if(theDraw.isDraw === 'erase'){ theDraw.setCurrentStyle(); }
 			theDraw.isDraw = 'brush';
+			$("#tools>div.active").removeClass("active");
+			$(this).addClass('active');
+			$canvas.attr('class', 'brush');
+		});
+		
+		$('#eraseBtn').click(function(){
+			theDraw.getCurrentStyle();
+			theDraw.isDraw = 'erase';
+			$("#tools>div.active").removeClass("active");
+			$(this).addClass('active');
+			$canvas.attr('class', 'erase');
 		});
 
 		$('#circleBtn').click(function(){
+			if(theDraw.isDraw === 'erase'){ theDraw.setCurrentStyle(); }
 			theDraw.isDraw = 'circle';
+			$("#tools>div.active").removeClass("active");
+			$(this).addClass('active');
+			$canvas.attr('class', 'draw');
 		});
 
 		$('#clearBtn').click(function(){
-
+			if(theDraw.isDraw === 'erase'){ theDraw.setCurrentStyle(); }
 			if(confirm('Are you sure you want to clear your drawings?')){
 				theDraw.clearScreen();
 				myDataRef.remove();
@@ -414,6 +503,11 @@ $(document).ready(function(){
 					theDraw.startBrush(x,y);
 					//myDataRef.push({x:x, y:y, color: {stroke:theDraw.getStrokeColor(), fill:theDraw.getfillColor(), size:theDraw.getStrokeSize()},  type: 'brush'});
 					break;
+				case 'erase':
+					theDraw.startErase(x,y);
+					//myDataRef.push({x:x, y:y, color: {stroke:theDraw.getStrokeColor(), fill:theDraw.getfillColor(), size:theDraw.getStrokeSize()},  type: 'brush'});
+					break;
+
 				case 'circle':
 					theDraw.startCircle(x,y);
 					myDataRef.push({x:x, y:y, color: {stroke:theDraw.getStrokeColor(), fill:theDraw.getfillColor(), size:theDraw.getStrokeSize()},  type: 'circle'});
@@ -448,6 +542,11 @@ $(document).ready(function(){
 					break;
 				case theDraw.brush:
 					holder = theDraw.drawBrush(x,y);
+					myDataRef.push(holder);
+					//theDraw.drawCoors(holder,true);
+					break;
+				case theDraw.erase:
+					holder = theDraw.drawErase(x,y);
 					myDataRef.push(holder);
 					//theDraw.drawCoors(holder,true);
 					break;
@@ -488,6 +587,10 @@ $(document).ready(function(){
 					//theDraw.startBrush(theDraw.posX,theDraw.posY);
 					myDataRef.push({x:'', y:'', color: {stroke:'#ffffff', fill:theDraw.getfillColor(), size:theDraw.getStrokeSize()},  type: 'brush'});
 					break;
+				case 'erase':
+					//theDraw.startErase(theDraw.posX,theDraw.posY);
+					myDataRef.push({x:'', y:'', color: {stroke:'#ffffff', fill:theDraw.getfillColor(), size:theDraw.getStrokeSize()},  type: 'erase'});
+					break;
 				case 'circle':
 					//theDraw.startCircle(x,y);
 					myDataRef.push({x:x, y:y, color: {stroke:theDraw.getStrokeColor(), fill:theDraw.getfillColor(), size:theDraw.getStrokeSize()},  type: 'circle'});
@@ -509,7 +612,7 @@ $(document).ready(function(){
 		myDataRef.on('child_added', function(snapshot) {
 			var coords = snapshot.val();
 			//console.log(coords.type + ' - ' + coords.x + ' - ' + coords.y);
-			if(coords.type === 'brush'){
+			if(coords.type === 'brush' || coords.type === 'erase'){
 				console.log(theDraw.drawCoors(coords));
 			} else {
 				theDraw.fromDB.push(coords);
