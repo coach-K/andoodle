@@ -18,6 +18,7 @@ function registerUser (){
           newMessage.text ("Error creating user:" + error);
         }
       } else {
+        window.location = "http://google.com";
         newMessage.text ("Successfully created user account with uid:" + userData.uid);
         var usersReference = ref.child("users")
         var usersRef = usersReference.push();
@@ -54,7 +55,9 @@ function registerUser (){
           message.text("Error logging user in:" + error);
         }
       } else {
+        window.location = "http://google.com"
         message.text("Authenticated successfully with payload:" + authData);
+        ;
       }
     }); 
   };
