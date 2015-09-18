@@ -397,7 +397,7 @@ var DrawTogether = function(canvas, container){
 
 $(document).ready(function(){
 
-	var myDataRef = new Firebase('https://wedraw.firebaseio.com/realtime_drawing');
+	var myDataRef = new Firebase('https://bc12-drawtogether.firebaseio.com/realtime_drawing');
 
 	var theCanvas = document.getElementById("canvas");
 	var container = document.querySelector('#container');
@@ -623,6 +623,135 @@ $(document).ready(function(){
 
 
 	
+
+
+	var online = $('#online-users');
+   // Creates a reference to the data base
+	var listRef = new Firebase("https://bc12-drawtogether.firebaseio.com/users/");
+	var userRef = listRef.push();
+	// Add ourselves to presence list when online.
+	var presenceRef = new Firebase("https://bc12-drawtogether.firebaseio.com/.info/connected");
+	// Attach an asynchronous callback to read the data of connected users
+	presenceRef.on("value", function(snap) {
+		if (snap.val()) {
+		userRef.set(true);
+		//This method removes users when they disconnect from Firebase.
+		userRef.onDisconnect().remove();
+		}
+	});
+	// Number of online users is the number of objects in the presence list.
+	listRef.on("value", function(snap) {
+	//console.log("# of online users = " + snap);
+	//This creates a variable to contain objects
+	var theHolder = {};
+	//This contains the objects from the users database. This object contains other objects also
+	var theVal = snap.val();
+	//This refreshes the html document before displaying the online users
+	online.html('');
+	//This creates a url variable to save an audio resource
+	var url = 'http://soundbible.com/grab.php?id=2067&type=mp3';
+	//Embed an audio resource which creates a sound to detect online users
+	document.getElementById("online-users").innerHTML="<audio autoplay='true' src='../assets/audio/andoodle.mp3'>";
+	for(var key in theVal){
+		var users = theVal[key];
+		if(users.username !== undefined){
+			var username = users.username;
+			var email = users.email;
+			theHolder[email] = username;
+			online.prepend('<div><img src="../images/user-50.png"/><br>' + theHolder[email] + '</div>');
+		}
+	}
+	});
+
+
+
+
+
+
+
+
+
+
+//Function to generate random string, used as key for database storage
+    function randomString(length) {
+        return Math.round((Math.pow(36, length + 1) - Math.random() *
+        Math.pow(36, length))).toString(36).slice(1);
+    }
+    //all needed variable declared here
+    var randomKey = randomString(5);
+    var FirebaseParentPath = new Firebase("https://bc12-drawtogether.firebaseio.com/");
+    var FirebasePathtoRealtimeDrawing = new Firebase("https://bc12-drawtogether.firebaseio.com/realtime_drawing");
+    var FireBasePathtoSaved = FirebaseParentPath.child("saved");
+    // call saveFromDraf function when the saved button is clicked
+    $("#save").click(function(){
+        saveFromDraft();
+    })
+    // call openFrom function when the the open button is clicked
+    $("#open").click(function(){
+        openFromSaved();
+        sendsavedclick();
+        //alert("It worked !!");
+    })
+    //an event listener that disable the canvas from editing
+    $("#disableCanvas").click(function(){
+        disableEventListenerOnCanvas("");
+    })
+    //snap the draming Xs and Ys cordinate and save it to saved folder on firebase
+    function saveFromDraft() {
+        FirebasePathtoRealtimeDrawing.once("value", function (snapshot) {
+            FireBasePathtoSaved.child(randomKey).set(snapshot.val());
+        })
+    }
+ }
+//write save files when button open is clickk
+    function openFromSaved(){
+        var $listsave = $('#listsave');
+        FireBasePathtoSaved.on("value", function(snapshot){
+            valueOfSnapshot = snapshot.val();
+            for(var key in valueOfSnapshot){
+                $listsave.append('<div id="openup"><img src="../images/layers-50.png" /> <a href="#"> id="'+key+'"><br>'+ key +'</a></div>')
+            }
+
+        })
+    }
+// get snapshots of selected saved drawing and pass it to the realtime for editing
+    function sendsavedclick(){
+        $("#listsave").click(function() {
+            $("#openup").click(function(){
+                var value1 = $(this).attr('id');
+                var appendToFirebasePathToSave = FireBasePathtoSaved.child(value1);
+                appendToFirebasePathToSave.once("value", function(snapshot){
+                    //bridging due to error "Dubug Now"
+                    var snapshotBridge = snapshot.val();
+                    FirebaseParentPath.child("realtime_drawing").set(snapshotBridge);
+                })
+            })
+            // console.log(value);
+            // var sendsavetolive = FireBasePathtoSaved.child(appedto);
+            // console.log(sendsavetolive);
+        });
+    }
+ // function to disblae the canvas
+ function disableEventListenerOnCanvas(){
+     $("canvas").unbind("mousedown","mousemove","mouseup");
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
 		
 });
