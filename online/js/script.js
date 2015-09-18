@@ -33,7 +33,7 @@ $(document).ready(function(){
 			var username = users.username;
 			var email = users.email;
 			theHolder[email] = username;
-			online.prepend('<div><img src="images/users-50.png"/><br>' + theHolder[email] + '</div>');
+			online.prepend('<div><img src="../dashboard/images/user-50.png"/><br>' + theHolder[email] + '</div>');
 		}
 	}
 	});
